@@ -1,0 +1,220 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.4'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: "application"
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+group = 'com.example'
+//version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '8'
+
+ext.javaMainClass = "com.example.NightTimeTemperature.NightTimeTemperatureApplication"
+ 
+application {
+    mainClassName = javaMainClass
+}
+
+
+//command: gradle -PbuildProfile=dev build
+if (project.hasProperty('buildProfile')) {
+	def buildProfile = project.getProperty('buildProfile')
+	if (buildProfile == 'dev') {
+        //activeProfile = devProfiles
+        apply from: rootProject.file('gradle/profile_dev.gradle');
+	} else {
+        //activeProfile = qaProfiles
+        apply from: rootProject.file('gradle/profile_qa.gradle');
+	}
+}
+
+
+
+
+
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    compile 'log4j:log4j:1.2.17'
+    compile "com.github.tomakehurst:wiremock-jre8:2.27.2"
+    compile 'org.springframework.boot:spring-boot-starter-test'
+    compile 'org.assertj:assertj-core:3.0.0'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-web-services'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testCompile "com.github.tomakehurst:wiremock-jre8:2.27.2"
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('com.jayway.jsonpath:json-path')
+    testCompile("org.projectlombok:lombok:1.16.14")
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+}
+
+
+//include integration-test gradle configuration
+apply from: rootProject.file('gradle/integration-test.gradle');
+        
+test {
+    useJUnitPlatform()
+}
+
+
+        /*
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/mian/java')
+        }
+        resources.srcDir file('src/main/resources')
+    }
+}
+
+test {
+	useJUnitPlatform()
+}
+*/
+
+/*
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/mian/java')
+        }
+        resources.srcDir file('src/main/resources')
+    }
+}
+
+test {
+	useJUnitPlatform()
+}
+*/
+/*
+tasks.register("bootRunDev") {
+    group = "application"
+    description = "Runs this project as a Spring Boot application with the dev profile"
+    doFirst {
+        tasks.bootRun.configure {
+            systemProperty("spring.profiles.active", "dev")
+        }
+    }
+    finalizedBy("bootRun")
+}
+*/
+/*
+task integrationTest(type: Test) {
+    description = 'Runs the integration tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter test
+}
+
+check.dependsOn integrationTest*/
+
+
+/*
+def moduleName = "org.gradle.sample"
+def patchArgs = ["--patch-module", "$moduleName=${tasks.compileJava.destinationDirectory.asFile.get().path}"]
+tasks.compileTestJava {
+    options.compilerArgs += patchArgs
+}
+tasks.test {
+    jvmArgs += patchArgs
+}
+*/
+
+//apply profile dev and qa
+//gradle bootRun -Dspring.profiles.active=dev
+/*
+task bootRunDev
+bootRunDev  {
+    System.setProperty("spring.profiles.active", "dev")
+}*/
+/*
+tasks.register("bootRunDev") {
+    group = "application"
+    description = "Runs the Spring Boot application with the dev profile"
+    doFirst {
+        tasks.bootRun.configure {
+            systemProperty("spring.profiles.active", "gradle/profile_dev.gradle")
+        }
+    }
+    finalizedBy("bootRun")
+}
+
+
+tasks.register("bootRunQa") {
+    group = "application"
+    description = "Runs the Spring Boot application with the qa profile"
+    doFirst {
+        tasks.bootRun.configure {
+            systemProperty("spring.profiles.active", "gradle/profile_qa.gradle")
+        }
+    }
+    finalizedBy("bootRun")
+}
+*/
+//use command for dev profile: gradle –Pdev bootRun
+//use command for qa profile: gradle –Pqa bootRun
+/*
+def devProfiles='dev'
+def qaProfiles='qa'
+def activeProfile;
+
+if (project.hasProperty('dev')) {
+        activeProfile = devProfiles
+        apply from: rootProject.file('gradle/profile_dev.gradle');
+    } else {
+        activeProfile = qaProfiles
+        apply from: rootProject.file('gradle/profile_qa.gradle');
+    }
+
+println 'Using profile: "' + activeProfile + '" for ' + project.getName()
+
+bootRun {
+        systemProperties = [
+            'spring.profiles.active': activeProfile
+        ]
+        
+            project.ext.applyPropertyIfExists = { propertyKey ->
+            if(project.hasProperty(propertyKey)) {
+                systemProperties[propertyKey] = project.getProperty(propertyKey)
+            }
+        }
+            project.ext.applyPropertyIfExists('spring.datasource.url')
+        applyPropertyIfExists('spring.datasource.username')
+        applyPropertyIfExists('spring.datasource.password')
+    }
+    
+    */

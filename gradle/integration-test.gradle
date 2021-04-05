@@ -1,0 +1,55 @@
+
+
+sourceSets {
+       integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+
+//Configures the compile and runtime configurations 
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+   
+    compile 'log4j:log4j:1.2.17'
+    testCompile 'junit:junit:4.11'
+    integrationTestCompile 'org.assertj:assertj-core:3.0.0'
+}
+
+//Create the task integrationTest 
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+}
+
+check.dependsOn integrationTest
+
+integrationTest.mustRunAfter test
+
+mainClassName = 'com.example.NightTimeTemperature.NightTimeTemperatureApplication'
+
+task copyLicense {
+    outputs.file new File("$buildDir/LICENSE")
+    doLast {
+        copy {
+            from "LICENSE"
+            into "$buildDir"
+        }
+    }
+}
+
+applicationDistribution.from(copyLicense) {
+    into ""
+}

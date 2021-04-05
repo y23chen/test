@@ -1,0 +1,6 @@
+version: '3.2'
+services:
+    dev:
+        build: ./docker-compose/dev
+        ports:
+         - "8050:8080"

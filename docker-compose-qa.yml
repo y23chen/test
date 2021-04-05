@@ -1,0 +1,6 @@
+version: '3.2'
+services:
+     qa:
+        build: ./docker-compose/qa
+        ports:
+         - "8060:8080"
